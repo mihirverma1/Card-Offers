@@ -267,6 +267,8 @@ export default async function handler(req, res) {
           ? "No crawler key is configured. Showing local estimates until backend search credentials are added."
           : `Found ${offers.length} possible offers. Verify bank terms before checkout.`,
       query,
+      debugErrors: search.errors,
+      debugHasFirecrawlKey: Boolean(process.env.FIRECRAWL_API_KEY),
     }, origin);
   } catch (error) {
     return jsonResponse(res, 500, {
