@@ -16,6 +16,10 @@ function getAllowedOrigin(origin) {
     .filter(Boolean);
 
   if (!origin || allowed.length === 0) return "*";
+  // Native app WebViews (Android/iOS load from file://) send "Origin: null".
+  // Echo it back so the packaged APK can call the API while the website stays
+  // locked to its allow-list.
+  if (origin === "null") return "null";
   return allowed.includes(origin) ? origin : allowed[0];
 }
 
