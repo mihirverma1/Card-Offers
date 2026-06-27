@@ -3,7 +3,7 @@
     { "src": "*.html", "use": "@vercel/static" },
     { "src": "*.css", "use": "@vercel/static" },
     { "src": "*.js", "use": "@vercel/static" },
-    { "src": "api/offers.js", "use": "@vercel/node", "config": { "maxDuration": 10 } },
+    { "src": "api/offers.js", "use": "@vercel/node", "config": { "maxDuration": 60 } },
     { "src": "api/cards.js", "use": "@vercel/node", "config": { "maxDuration": 10 } }
   ],
   "routes": [
