@@ -37,14 +37,15 @@ function safeUrl(value) {
 }
 
 function buildQuery(input) {
+  const year = new Date().getFullYear();
   return [
     input.bank,
     input.variant,
-    input.vendor,
-    input.merchant,
+    input.network,
+    "credit card",
     input.category,
-    "credit card offer coupon discount cashback",
-    input.location,
+    "offers discount cashback",
+    year,
   ]
     .filter(Boolean)
     .join(" ")
@@ -52,18 +53,12 @@ function buildQuery(input) {
 }
 
 function parseInput(body) {
-  const input = {
+  return {
     bank: clean(body.bank, "HDFC Bank"),
-    vendor: clean(body.vendor, "Visa"),
+    network: clean(body.network || body.issuer || body.vendor, "Visa"),
     variant: clean(body.variant, "Selected card"),
-    merchant: clean(body.merchant, "online merchants"),
     category: clean(body.category, "Shopping"),
-    location: clean(body.location, "India"),
-    amount: Number(body.amount || 0),
   };
-
-  if (!Number.isFinite(input.amount) || input.amount < 0) input.amount = 0;
-  return input;
 }
 
 async function firecrawlSearch(query) {
@@ -162,77 +157,80 @@ async function serpApiSearch(query) {
   };
 }
 
-function offerValue(input, text) {
-  const amount = Number(input.amount || 0);
-  const percentMatch = text.match(/(\d{1,2})\s?%/);
-  const capMatch = text.match(/(?:up to|upto|max(?:imum)?|cap(?:ped)? at|rs\.?|₹)\s?(\d{2,6})/i);
-  const percent = percentMatch ? Number(percentMatch[1]) / 100 : defaultRate(input.category);
-  const cap = capMatch ? Number(capMatch[1]) : defaultCap(input.category);
-  return Math.max(0, Math.min(Math.round(amount * percent), cap));
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-function defaultRate(category) {
-  const rates = {
-    Dining: 0.15,
-    Travel: 0.12,
-    Electronics: 0.1,
-    Shopping: 0.1,
-    Grocery: 0.08,
-    Fuel: 0.04,
-    Entertainment: 0.12,
-  };
-  return rates[category] || 0.08;
-}
+// Words that signal an actual offer/deal vs. a generic product or apply page.
+const OFFER_SIGNALS =
+  /(\boffer\b|\boffers\b|discount|cash\s?back|%\s?off|\bsave\b|\bdeal\b|bonus|voucher|coupon|reward|instant|\bemi\b|\bflat\b|up\s?to|welcome benefit|milestone)/i;
+// Words that signal a page we usually do NOT want (application/marketing/support).
+const NOISE_SIGNALS =
+  /(apply\s?now|apply\s?for|how\s?to\s?apply|eligibility|documents?\s?required|fees?\s?(and|&)\s?charges|annual\s?fee|customer\s?care|net\s?banking|\blogin\b|application\s?status|compare\s?cards)/i;
 
-function defaultCap(category) {
-  return category === "Fuel" ? 250 : category === "Dining" ? 1000 : 1500;
+// Rank a search result by how likely it is to be a real, relevant offer.
+function scoreResult(text, input) {
+  let score = 0;
+  if (OFFER_SIGNALS.test(text)) score += 2;
+  if (/\d{1,2}\s?%/.test(text)) score += 1; // an explicit percentage
+  if (new RegExp(escapeRegExp(input.category), "i").test(text)) score += 1;
+  if (new RegExp(escapeRegExp(input.bank), "i").test(text)) score += 1;
+  if (NOISE_SIGNALS.test(text)) score -= 2;
+  return score;
 }
 
 function normalizeOffers(search, input) {
   const seen = new Set();
-  const offers = [];
+  const scored = [];
 
   for (const result of search.results) {
     const title = clean(result.title, `${input.bank} card offer`);
     const url = safeUrl(result.url);
-    const snippet = clean(result.snippet, "Offer details found online. Verify card eligibility, coupon code, exclusions, and current validity.");
+    const snippet = clean(
+      result.snippet,
+      "Offer details found online. Verify card eligibility, coupon code, exclusions, and current validity."
+    );
     const key = `${title}|${url}`;
     if (seen.has(key)) continue;
     seen.add(key);
 
     const text = `${title} ${snippet}`;
-    offers.push({
-      title,
-      summary: snippet.length > 155 ? `${snippet.slice(0, 152)}...` : snippet,
-      bank: input.bank,
-      vendor: input.vendor,
-      variant: input.variant,
-      merchant: input.merchant,
-      validity: /valid|expires|till|until/i.test(text) ? "Validity mentioned in source" : "Check live terms",
-      confidence: search.provider === "firecrawl" ? "Crawled" : "Search result",
-      estimatedValue: offerValue(input, text),
-      minimumSpend: Math.max(500, Math.round((input.amount || 1000) * 0.7)),
-      sourceUrl: url,
+    scored.push({
+      score: scoreResult(text, input),
+      offer: {
+        title,
+        summary: snippet.length > 200 ? `${snippet.slice(0, 197)}...` : snippet,
+        bank: input.bank,
+        network: input.network,
+        variant: input.variant,
+        category: input.category,
+        validity: /valid|expires|till|until|last date/i.test(text)
+          ? "Validity mentioned in source"
+          : "Check live terms",
+        confidence: search.provider === "firecrawl" ? "Crawled" : "Search result",
+        sourceUrl: url,
+      },
     });
   }
 
-  return offers.slice(0, 6);
+  scored.sort((a, b) => b.score - a.score);
+  // Prefer results that actually look like offers; if none score positively,
+  // fall back to the top results rather than showing nothing.
+  const relevant = scored.filter((item) => item.score > 0);
+  return (relevant.length ? relevant : scored).slice(0, 6).map((item) => item.offer);
 }
 
 function localOffers(input) {
-  const baseValue = Math.min(Math.round((input.amount || 5000) * defaultRate(input.category)), defaultCap(input.category));
   return [
     {
-      title: `${input.bank} ${input.variant} ${input.category.toLowerCase()} benefit`,
-      summary: `Estimated instant discount, cashback, or accelerated reward points for ${input.merchant}. Confirm coupon code, eligible card variant, and network exclusions on checkout.`,
+      title: `${input.bank} ${input.variant} ${input.category} offer`,
+      summary: `Look for instant discounts, cashback, or accelerated rewards on ${input.category.toLowerCase()} spends with your ${input.bank} ${input.variant} (${input.network}) card. Confirm coupon code, eligible card variant, and network exclusions at checkout.`,
       bank: input.bank,
-      vendor: input.vendor,
+      network: input.network,
       variant: input.variant,
-      merchant: input.merchant,
+      category: input.category,
       validity: "Live terms required",
       confidence: "Offline estimate",
-      estimatedValue: baseValue,
-      minimumSpend: Math.max(500, Math.round((input.amount || 1000) * 0.7)),
       sourceUrl: "",
     },
   ];

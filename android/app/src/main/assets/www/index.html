@@ -29,28 +29,28 @@
               <option>IndusInd Bank</option>
               <option>American Express</option>
               <option>AU Small Finance Bank</option>
+              <option>Yes Bank</option>
+              <option>RBL Bank</option>
+              <option>IDFC FIRST Bank</option>
+              <option>Standard Chartered</option>
+              <option>HSBC</option>
             </select>
           </label>
 
           <label>
-            <span>Card vendor</span>
-            <select id="vendorSelect">
-              <option>Visa</option>
-              <option>Mastercard</option>
-              <option>RuPay</option>
-              <option>American Express</option>
-              <option>Diners Club</option>
-            </select>
-          </label>
-
-          <label class="wide">
             <span>Card variant</span>
             <input id="variantInput" type="text" value="Regalia Gold" placeholder="e.g. Millennia, Coral, SimplyCLICK" />
           </label>
 
           <label>
-            <span>Merchant</span>
-            <input id="merchantInput" type="text" value="Amazon" placeholder="Amazon, Flipkart, Swiggy..." />
+            <span>Card network (issuer)</span>
+            <select id="networkSelect">
+              <option>RuPay</option>
+              <option selected>Visa</option>
+              <option>Mastercard</option>
+              <option>American Express</option>
+              <option>Diners Club</option>
+            </select>
           </label>
 
           <label>
@@ -63,17 +63,11 @@
               <option>Grocery</option>
               <option>Electronics</option>
               <option>Entertainment</option>
+              <option>UPI</option>
+              <option>Movies</option>
+              <option>Insurance</option>
+              <option>Utilities</option>
             </select>
-          </label>
-
-          <label>
-            <span>Spend amount</span>
-            <input id="amountInput" type="number" min="0" step="100" value="5000" />
-          </label>
-
-          <label>
-            <span>Location</span>
-            <input id="locationInput" type="text" value="India" placeholder="City or country" />
           </label>
 
           <button class="primary-button wide" type="submit">
@@ -84,7 +78,7 @@
 
         <section class="status-strip" id="statusStrip">
           <strong>Ready</strong>
-          <span>Searches bank, card-network, and merchant offer pages.</span>
+          <span>Finds live offers for your bank, card variant, network, and category.</span>
         </section>
 
         <section class="results-list" id="resultsList" aria-live="polite"></section>

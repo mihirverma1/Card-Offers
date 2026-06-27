@@ -7,12 +7,9 @@ const views = document.querySelectorAll(".view");
 
 const controls = {
   bank: document.querySelector("#bankSelect"),
-  vendor: document.querySelector("#vendorSelect"),
   variant: document.querySelector("#variantInput"),
-  merchant: document.querySelector("#merchantInput"),
+  network: document.querySelector("#networkSelect"),
   category: document.querySelector("#categorySelect"),
-  amount: document.querySelector("#amountInput"),
-  location: document.querySelector("#locationInput"),
 };
 
 const API_BASE_URL = window.CARD_OFFERS_API_BASE_URL || "";
@@ -20,14 +17,6 @@ const savedOffers = JSON.parse(localStorage.getItem("savedCardOffers") || "[]");
 
 function setStatus(title, detail) {
   statusStrip.innerHTML = `<strong>${title}</strong><span>${detail}</span>`;
-}
-
-function currency(value) {
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
-    maximumFractionDigits: 0,
-  }).format(Number(value || 0));
 }
 
 function escapeHtml(value) {
@@ -46,17 +35,14 @@ function escapeHtml(value) {
 function buildPayload() {
   return {
     bank: controls.bank.value,
-    vendor: controls.vendor.value,
     variant: controls.variant.value.trim(),
-    merchant: controls.merchant.value.trim(),
+    network: controls.network.value,
     category: controls.category.value,
-    amount: Number(controls.amount.value || 0),
-    location: controls.location.value.trim() || "India",
   };
 }
 
 function offerId(offer) {
-  return [offer.title, offer.merchant, offer.bank, offer.sourceUrl].join("|");
+  return [offer.title, offer.category, offer.bank, offer.sourceUrl].join("|");
 }
 
 function renderOffers(container, offers, emptyText) {
@@ -77,7 +63,7 @@ function renderOffers(container, offers, emptyText) {
 
     const sourceLink = sourceUrl
       ? `<a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noreferrer">Source</a>`
-      : `<a href="https://www.google.com/search?q=${encodeURIComponent(`${offer.bank} ${offer.variant} ${offer.merchant} card offer`)}" target="_blank" rel="noreferrer">Search</a>`;
+      : `<a href="https://www.google.com/search?q=${encodeURIComponent(`${offer.bank} ${offer.variant} ${offer.category} card offer`)}" target="_blank" rel="noreferrer">Search</a>`;
 
     card.innerHTML = `
       <header>
@@ -87,13 +73,10 @@ function renderOffers(container, offers, emptyText) {
       <p>${escapeHtml(offer.summary)}</p>
       <div class="meta-row">
         <span>${escapeHtml(offer.bank)}</span>
-        <span>${escapeHtml(offer.vendor)}</span>
         <span>${escapeHtml(offer.variant)}</span>
+        <span>${escapeHtml(offer.network || offer.vendor || "")}</span>
+        <span>${escapeHtml(offer.category || "")}</span>
         <span>${escapeHtml(offer.validity || "Check terms")}</span>
-      </div>
-      <div class="meta-row">
-        <span>Expected value: ${currency(offer.estimatedValue)}</span>
-        <span>Minimum spend: ${currency(offer.minimumSpend)}</span>
       </div>
       <div class="offer-actions">
         <button type="button" data-save="${offerId(offer)}">Save</button>
@@ -139,11 +122,11 @@ form.addEventListener("submit", async (event) => {
   const payload = buildPayload();
 
   button.disabled = true;
-  setStatus("Searching", `Checking current ${payload.bank}, ${payload.vendor}, and ${payload.merchant} offer pages.`);
+  setStatus("Searching", `Checking current ${payload.bank} ${payload.variant} (${payload.network}) ${payload.category} offers.`);
 
   try {
     const data = await fetchOffers(payload);
-    renderOffers(resultsList, data.offers || [], "No offers found. Try another merchant, card variant, or spend amount.");
+    renderOffers(resultsList, data.offers || [], "No offers found. Try a different card variant, network, or category.");
     setStatus(data.providerLabel || "Search complete", data.summary || "Review source links and bank terms before purchase.");
   } catch (error) {
     setStatus("Offline estimate", "Backend search is unavailable, so the app generated local estimates.");
@@ -154,22 +137,16 @@ form.addEventListener("submit", async (event) => {
 });
 
 function buildFallbackOffers(payload) {
-  const amount = Number(payload.amount || 0);
-  const rate = payload.category === "Travel" ? 0.12 : payload.category === "Dining" ? 0.15 : 0.1;
-  const value = Math.min(Math.round(amount * rate), 1500);
-
   return [
     {
-      title: `${payload.bank} ${payload.variant || "card"} ${payload.category.toLowerCase()} offer`,
-      summary: `Possible instant discount or reward acceleration for ${payload.merchant || "selected merchants"}. Confirm coupon code, minimum order, and card-network exclusions before checkout.`,
+      title: `${payload.bank} ${payload.variant || "card"} ${payload.category} offer`,
+      summary: `Possible instant discount, cashback, or accelerated rewards on ${payload.category.toLowerCase()} spends. Confirm coupon code, eligible card variant, and card-network exclusions before checkout.`,
       bank: payload.bank,
-      vendor: payload.vendor,
+      network: payload.network,
       variant: payload.variant || "Selected card",
-      merchant: payload.merchant || payload.category,
+      category: payload.category,
       validity: "Live terms required",
       confidence: "Local estimate",
-      estimatedValue: value,
-      minimumSpend: Math.max(1000, Math.round(amount * 0.7)),
       sourceUrl: "",
     },
   ];
