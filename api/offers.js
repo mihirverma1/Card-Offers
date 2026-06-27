@@ -38,10 +38,11 @@ function safeUrl(value) {
 
 function buildQuery(input) {
   const year = new Date().getFullYear();
+  // Keep the query offer-centric. Including the exact variant/network pulls the
+  // card's own product/apply pages to the top, so we lead with bank + category
+  // + offer terms and let scoring reward variant/network matches afterwards.
   return [
     input.bank,
-    input.variant,
-    input.network,
     "credit card",
     input.category,
     "offers discount cashback",
@@ -73,7 +74,7 @@ async function firecrawlSearch(query) {
     },
     body: JSON.stringify({
       query,
-      limit: 6,
+      limit: 15,
       scrapeOptions: {
         formats: ["markdown"],
         onlyMainContent: true,
@@ -167,15 +168,23 @@ const OFFER_SIGNALS =
 // Words that signal a page we usually do NOT want (application/marketing/support).
 const NOISE_SIGNALS =
   /(apply\s?now|apply\s?for|how\s?to\s?apply|eligibility|documents?\s?required|fees?\s?(and|&)\s?charges|annual\s?fee|customer\s?care|net\s?banking|\blogin\b|application\s?status|compare\s?cards)/i;
+// Social / forum / video domains rarely host actionable offer terms.
+const NOISE_DOMAINS =
+  /(instagram\.com|facebook\.com|twitter\.com|x\.com|reddit\.com|youtube\.com|youtu\.be|quora\.com|linkedin\.com|pinterest\.|threads\.net)/i;
 
 // Rank a search result by how likely it is to be a real, relevant offer.
-function scoreResult(text, input) {
+function scoreResult(text, url, input) {
   let score = 0;
   if (OFFER_SIGNALS.test(text)) score += 2;
   if (/\d{1,2}\s?%/.test(text)) score += 1; // an explicit percentage
   if (new RegExp(escapeRegExp(input.category), "i").test(text)) score += 1;
   if (new RegExp(escapeRegExp(input.bank), "i").test(text)) score += 1;
+  if (input.variant && new RegExp(escapeRegExp(input.variant), "i").test(text)) score += 1;
   if (NOISE_SIGNALS.test(text)) score -= 2;
+  // URL/domain signals are strong indicators of page type.
+  if (/offer|deal/i.test(url)) score += 2;
+  if (/\/(apply|eligibility|fees|charges)/i.test(url)) score -= 2;
+  if (NOISE_DOMAINS.test(url)) score -= 5;
   return score;
 }
 
@@ -194,9 +203,12 @@ function normalizeOffers(search, input) {
     if (seen.has(key)) continue;
     seen.add(key);
 
+    // Drop social/forum/video links outright — they're never real offer pages.
+    if (url && NOISE_DOMAINS.test(url)) continue;
+
     const text = `${title} ${snippet}`;
     scored.push({
-      score: scoreResult(text, input),
+      score: scoreResult(text, url, input),
       offer: {
         title,
         summary: snippet.length > 200 ? `${snippet.slice(0, 197)}...` : snippet,
