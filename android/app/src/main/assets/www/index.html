@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Card Offer Finder</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="top-bar">
+        <div>
+          <span class="eyebrow">Live Card Deals</span>
+          <h1>Find the best offer for your card</h1>
+        </div>
+        <span class="sync-dot" aria-hidden="true"></span>
+      </header>
+
+      <section class="view active" id="finderView" aria-label="Offer finder">
+        <form class="finder-panel" id="offerForm">
+          <label>
+            <span>Bank</span>
+            <select id="bankSelect">
+              <option>HDFC Bank</option>
+              <option>ICICI Bank</option>
+              <option>Axis Bank</option>
+              <option>SBI Card</option>
+              <option>Kotak Mahindra Bank</option>
+              <option>IndusInd Bank</option>
+              <option>American Express</option>
+              <option>AU Small Finance Bank</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Card vendor</span>
+            <select id="vendorSelect">
+              <option>Visa</option>
+              <option>Mastercard</option>
+              <option>RuPay</option>
+              <option>American Express</option>
+              <option>Diners Club</option>
+            </select>
+          </label>
+
+          <label class="wide">
+            <span>Card variant</span>
+            <input id="variantInput" type="text" value="Regalia Gold" placeholder="e.g. Millennia, Coral, SimplyCLICK" />
+          </label>
+
+          <label>
+            <span>Merchant</span>
+            <input id="merchantInput" type="text" value="Amazon" placeholder="Amazon, Flipkart, Swiggy..." />
+          </label>
+
+          <label>
+            <span>Category</span>
+            <select id="categorySelect">
+              <option>Shopping</option>
+              <option>Travel</option>
+              <option>Dining</option>
+              <option>Fuel</option>
+              <option>Grocery</option>
+              <option>Electronics</option>
+              <option>Entertainment</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Spend amount</span>
+            <input id="amountInput" type="number" min="0" step="100" value="5000" />
+          </label>
+
+          <label>
+            <span>Location</span>
+            <input id="locationInput" type="text" value="India" placeholder="City or country" />
+          </label>
+
+          <button class="primary-button wide" type="submit">
+            <span aria-hidden="true">↻</span>
+            Find Offers
+          </button>
+        </form>
+
+        <section class="status-strip" id="statusStrip">
+          <strong>Ready</strong>
+          <span>Searches bank, card-network, and merchant offer pages.</span>
+        </section>
+
+        <section class="results-list" id="resultsList" aria-live="polite"></section>
+      </section>
+
+      <section class="view" id="sourcesView" aria-label="Sources and crawlers">
+        <h2>Search Sources</h2>
+        <div class="source-grid">
+          <article>
+            <strong>Firecrawl</strong>
+            <span>Primary crawler. Uses search plus scraped page content when `FIRECRAWL_API_KEY` is configured.</span>
+          </article>
+          <article>
+            <strong>Tavily</strong>
+            <span>Optional fallback for search snippets with `TAVILY_API_KEY`.</span>
+          </article>
+          <article>
+            <strong>SerpAPI</strong>
+            <span>Optional search fallback through Google results with `SERPAPI_API_KEY`.</span>
+          </article>
+          <article>
+            <strong>Offline rules</strong>
+            <span>Local estimates keep the app usable while backend credentials are not deployed.</span>
+          </article>
+        </div>
+      </section>
+
+      <section class="view" id="savedView" aria-label="Saved offers">
+        <h2>Saved Offers</h2>
+        <section class="results-list" id="savedList"></section>
+      </section>
+
+      <nav class="bottom-tabs" aria-label="App sections">
+        <button class="tab-button active" type="button" data-view="finderView" aria-pressed="true">
+          <span aria-hidden="true">⌕</span>
+          Finder
+        </button>
+        <button class="tab-button" type="button" data-view="sourcesView" aria-pressed="false">
+          <span aria-hidden="true">◎</span>
+          Sources
+        </button>
+        <button class="tab-button" type="button" data-view="savedView" aria-pressed="false">
+          <span aria-hidden="true">★</span>
+          Saved
+        </button>
+      </nav>
+    </main>
+
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>

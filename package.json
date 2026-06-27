@@ -1,0 +1,16 @@
+{
+  "name": "card-offer-finder",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev",
+    "start": "python3 -m http.server 4173"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "vercel": "^48.0.0"
+  }
+}

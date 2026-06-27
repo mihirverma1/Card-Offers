@@ -1,0 +1,1 @@
+window.CARD_OFFERS_API_BASE_URL = "";

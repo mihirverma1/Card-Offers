@@ -1,0 +1,19 @@
+# OS
+.DS_Store
+
+# Node
+node_modules/
+
+# Env / secrets
+.env
+.env.local
+.env*.local
+
+# Vercel
+.vercel
+
+# Android build output
+android/build/
+android/app/build/
+android/.gradle/
+android/local.properties
