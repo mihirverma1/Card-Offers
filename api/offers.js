@@ -85,13 +85,19 @@ async function firecrawlSearch(query) {
 
   const data = await response.json();
   if (!response.ok) throw new Error(data.error || "Firecrawl search failed");
+  // Firecrawl v2 /search returns data.data either as a flat array or as an
+  // object keyed by source ({ web: [...], news: [...], images: [...] }).
+  const raw = data.data;
+  const items = Array.isArray(raw)
+    ? raw
+    : [...(raw?.web || []), ...(raw?.news || [])];
   return {
     provider: "firecrawl",
     providerLabel: "Firecrawl search complete",
-    results: (data.data || []).map((item) => ({
+    results: items.map((item) => ({
       title: item.title,
       url: item.url,
-      snippet: item.description || item.markdown || "",
+      snippet: item.description || item.markdown || item.snippet || "",
     })),
   };
 }
@@ -267,8 +273,6 @@ export default async function handler(req, res) {
           ? "No crawler key is configured. Showing local estimates until backend search credentials are added."
           : `Found ${offers.length} possible offers. Verify bank terms before checkout.`,
       query,
-      debugErrors: search.errors,
-      debugHasFirecrawlKey: Boolean(process.env.FIRECRAWL_API_KEY),
     }, origin);
   } catch (error) {
     return jsonResponse(res, 500, {
