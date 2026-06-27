@@ -1,22 +1,21 @@
 {
-  "functions": {
-    "api/offers.js": {
-      "maxDuration": 30
-    }
-  },
-  "headers": [
+  "builds": [
+    { "src": "*.html", "use": "@vercel/static" },
+    { "src": "*.css", "use": "@vercel/static" },
+    { "src": "*.js", "use": "@vercel/static" },
+    { "src": "api/offers.js", "use": "@vercel/node", "config": { "maxDuration": 30 } }
+  ],
+  "routes": [
+    { "src": "/api/offers", "methods": ["GET", "POST", "OPTIONS"], "dest": "/api/offers.js" },
     {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        },
-        {
-          "key": "Referrer-Policy",
-          "value": "strict-origin-when-cross-origin"
-        }
-      ]
-    }
+      "src": "/(.*)",
+      "headers": {
+        "X-Content-Type-Options": "nosniff",
+        "Referrer-Policy": "strict-origin-when-cross-origin"
+      },
+      "continue": true
+    },
+    { "handle": "filesystem" },
+    { "src": "/", "dest": "/index.html" }
   ]
 }
