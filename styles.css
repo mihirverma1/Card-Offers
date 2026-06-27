@@ -251,6 +251,101 @@ input {
   line-height: 1.4;
 }
 
+.detail-btn {
+  border-color: rgba(14, 139, 114, 0.3) !important;
+  color: var(--mint) !important;
+}
+
+/* ---- Offer detail screen ---- */
+.back-link {
+  justify-self: start;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.detail-body {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--paper);
+}
+
+.detail-body h2 {
+  font-size: 1.3rem;
+  line-height: 1.2;
+}
+
+.detail-body h3 {
+  margin-top: 6px;
+  font-size: 0.95rem;
+}
+
+.detail-body p {
+  color: #344150;
+  line-height: 1.45;
+}
+
+.detail-card-line {
+  color: var(--muted) !important;
+  font-weight: 700;
+}
+
+.detail-body ul {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 5px;
+}
+
+.detail-body li {
+  color: #344150;
+  line-height: 1.4;
+}
+
+.detail-grid {
+  display: grid;
+  gap: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.detail-row {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.detail-row:last-child {
+  border-bottom: 0;
+}
+
+.detail-label {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.detail-body .primary-button {
+  margin-top: 6px;
+  text-decoration: none;
+}
+
+.fine-print {
+  color: var(--muted) !important;
+  font-size: 0.82rem;
+  line-height: 1.4 !important;
+}
+
 .offer-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;

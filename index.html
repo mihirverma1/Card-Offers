@@ -3,59 +3,41 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>Card Offer Finder</title>
+    <title>My Card Offers</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <main class="app-shell">
       <header class="top-bar">
         <div>
-          <span class="eyebrow">Live Card Deals</span>
-          <h1>Find the best offer for your card</h1>
+          <span class="eyebrow">Your cards, your offers</span>
+          <h1 id="topTitle">See every offer on your card</h1>
         </div>
         <span class="sync-dot" aria-hidden="true"></span>
       </header>
 
-      <section class="view active" id="finderView" aria-label="Offer finder">
-        <form class="finder-panel" id="offerForm">
-          <label>
+      <!-- FINDER: pick your card -->
+      <section class="view active" id="finderView" aria-label="Choose your card">
+        <form class="finder-panel" id="cardForm">
+          <label class="wide">
             <span>Bank</span>
-            <select id="bankSelect">
-              <option>HDFC Bank</option>
-              <option>ICICI Bank</option>
-              <option>Axis Bank</option>
-              <option>SBI Card</option>
-              <option>Kotak Mahindra Bank</option>
-              <option>IndusInd Bank</option>
-              <option>American Express</option>
-              <option>AU Small Finance Bank</option>
-              <option>Yes Bank</option>
-              <option>RBL Bank</option>
-              <option>IDFC FIRST Bank</option>
-              <option>Standard Chartered</option>
-              <option>HSBC</option>
-            </select>
+            <select id="bankSelect"></select>
           </label>
 
-          <label>
+          <label class="wide">
             <span>Card variant</span>
-            <input id="variantInput" type="text" value="Regalia Gold" placeholder="e.g. Millennia, Coral, SimplyCLICK" />
+            <select id="variantSelect"></select>
           </label>
 
           <label>
-            <span>Card network (issuer)</span>
-            <select id="networkSelect">
-              <option>RuPay</option>
-              <option selected>Visa</option>
-              <option>Mastercard</option>
-              <option>American Express</option>
-              <option>Diners Club</option>
-            </select>
+            <span>Network</span>
+            <select id="networkSelect"></select>
           </label>
 
           <label>
             <span>Category</span>
             <select id="categorySelect">
+              <option value="">All categories</option>
               <option>Shopping</option>
               <option>Travel</option>
               <option>Dining</option>
@@ -71,58 +53,66 @@
           </label>
 
           <button class="primary-button wide" type="submit">
-            <span aria-hidden="true">↻</span>
-            Find Offers
+            <span aria-hidden="true">⌕</span>
+            View my offers
           </button>
         </form>
 
         <section class="status-strip" id="statusStrip">
-          <strong>Ready</strong>
-          <span>Finds live offers for your bank, card variant, network, and category.</span>
+          <strong>Pick your card</strong>
+          <span>Select your bank, card and network to see every live offer on it.</span>
         </section>
 
         <section class="results-list" id="resultsList" aria-live="polite"></section>
       </section>
 
-      <section class="view" id="sourcesView" aria-label="Sources and crawlers">
-        <h2>Search Sources</h2>
-        <div class="source-grid">
-          <article>
-            <strong>Firecrawl</strong>
-            <span>Primary crawler. Uses search plus scraped page content when `FIRECRAWL_API_KEY` is configured.</span>
-          </article>
-          <article>
-            <strong>Tavily</strong>
-            <span>Optional fallback for search snippets with `TAVILY_API_KEY`.</span>
-          </article>
-          <article>
-            <strong>SerpAPI</strong>
-            <span>Optional search fallback through Google results with `SERPAPI_API_KEY`.</span>
-          </article>
-          <article>
-            <strong>Offline rules</strong>
-            <span>Local estimates keep the app usable while backend credentials are not deployed.</span>
-          </article>
-        </div>
+      <!-- DETAIL: full offer -->
+      <section class="view" id="detailView" aria-label="Offer details">
+        <button class="back-link" type="button" id="backToList">← Back to offers</button>
+        <article class="detail-body" id="detailBody"></article>
       </section>
 
+      <!-- SAVED -->
       <section class="view" id="savedView" aria-label="Saved offers">
-        <h2>Saved Offers</h2>
+        <h2>Saved offers</h2>
         <section class="results-list" id="savedList"></section>
+      </section>
+
+      <!-- ABOUT -->
+      <section class="view" id="aboutView" aria-label="About">
+        <h2>How this works</h2>
+        <section class="source-grid">
+          <article>
+            <strong>1. We collect offers</strong>
+            <span>A crawler scans bank, network and merchant websites for current credit-card offers.</span>
+          </article>
+          <article>
+            <strong>2. We organise them</strong>
+            <span>Each offer is structured with its discount, validity, eligibility and full terms into one offers database.</span>
+          </article>
+          <article>
+            <strong>3. You just pick your card</strong>
+            <span>No card details needed — choose your bank, variant and network, and see what applies to you.</span>
+          </article>
+          <article>
+            <strong>Always verify</strong>
+            <span>Offers change often. Each offer links to the official source — confirm final terms there before you spend.</span>
+          </article>
+        </section>
       </section>
 
       <nav class="bottom-tabs" aria-label="App sections">
         <button class="tab-button active" type="button" data-view="finderView" aria-pressed="true">
           <span aria-hidden="true">⌕</span>
-          Finder
-        </button>
-        <button class="tab-button" type="button" data-view="sourcesView" aria-pressed="false">
-          <span aria-hidden="true">◎</span>
-          Sources
+          My card
         </button>
         <button class="tab-button" type="button" data-view="savedView" aria-pressed="false">
           <span aria-hidden="true">★</span>
           Saved
+        </button>
+        <button class="tab-button" type="button" data-view="aboutView" aria-pressed="false">
+          <span aria-hidden="true">ⓘ</span>
+          About
         </button>
       </nav>
     </main>
