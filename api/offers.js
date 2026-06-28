@@ -11,6 +11,15 @@ import { aiConfigured, aiSearch } from "../lib/ai.js";
 
 const CACHE_DAYS = Number(process.env.OFFERS_CACHE_DAYS || 7);
 
+const DEBUG_ENV = {
+  hasSupabaseUrl: Boolean(process.env.SUPABASE_URL),
+  hasSupabaseKey: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY),
+  hasGemini: Boolean(process.env.GEMINI_API_KEY),
+  hasTavily: Boolean(process.env.TAVILY_API_KEY),
+  hasFirecrawl: Boolean(process.env.FIRECRAWL_API_KEY),
+  aiConfigured: aiConfigured(),
+};
+
 function clean(value) {
   return String(value ?? "").trim().slice(0, 120);
 }
@@ -60,27 +69,33 @@ export default async function handler(req, res) {
       search && Date.now() - new Date(search.last_fetched_at).getTime() < CACHE_DAYS * 86400000;
 
     let source = "cache";
+    let aiError = null;
+    let aiFound = null;
 
     // Stale or never fetched -> run the AI pipeline, then remember we did.
     if (!fresh && aiConfigured()) {
       source = "live";
       try {
         const found = await aiSearch(sel);
+        aiFound = found.length;
         if (found.length) await upsertOffers(found);
         await markSearched(cardKey, sel);
       } catch (err) {
         // If the AI step fails, fall through and serve whatever is already stored.
         source = "cache";
+        aiError = err.message;
       }
     }
 
+    const debug = { ...DEBUG_ENV, fresh: Boolean(fresh), aiFound, aiError };
+
     const dbOffers = (await getOffersByBank(sel.bank)).filter((o) => matches(o, sel));
     if (dbOffers.length) {
-      return jsonResponse(res, 200, payload(dbOffers, source), origin);
+      return jsonResponse(res, 200, payload(dbOffers, source, { debug }), origin);
     }
 
     // Nothing in the DB for this card -> last-resort bundled seed.
-    return jsonResponse(res, 200, payload(filterOffers(sel), "builtin"), origin);
+    return jsonResponse(res, 200, payload(filterOffers(sel), "builtin", { debug }), origin);
   } catch (err) {
     // Any DB error -> never break the app; serve the seed.
     return jsonResponse(res, 200, payload(filterOffers(sel), "builtin"), origin);
