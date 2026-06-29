@@ -431,21 +431,101 @@ input {
   line-height: 1.45;
 }
 
+/* ===== Desktop: render as a full website, not a phone frame ===== */
 @media (min-width: 760px) {
+  html,
   body {
-    display: grid;
-    place-items: center;
-    min-height: 100vh;
-    padding: 24px;
+    background:
+      linear-gradient(180deg, rgba(16, 34, 53, 0.04), transparent 320px),
+      var(--surface);
   }
 
   .app-shell {
-    min-height: min(900px, calc(100vh - 48px));
-    border: 8px solid #17212b;
-    border-radius: 28px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: none;
+    min-height: 100vh;
+    margin: 0;
+    background: transparent;
+    box-shadow: none;
+    overflow: visible;
   }
 
   .top-bar {
-    border-radius: 18px 18px 0 0;
+    order: 0;
+    align-items: center;
+    padding: 30px clamp(24px, 6vw, 96px);
+  }
+
+  .top-bar h1 {
+    max-width: none;
+    font-size: 2.4rem;
+  }
+
+  /* Tabs become a top nav bar */
+  .bottom-tabs {
+    order: 1;
+    position: static;
+    transform: none;
+    width: 100%;
+    grid-template-columns: repeat(3, max-content);
+    justify-content: start;
+    gap: 6px;
+    padding: 10px clamp(24px, 6vw, 96px);
+    border-top: 0;
+    border-bottom: 1px solid var(--line);
+    background: #fff;
+    backdrop-filter: none;
+  }
+
+  .tab-button {
+    grid-auto-flow: column;
+    align-items: center;
+    gap: 8px;
+    min-height: 42px;
+    padding: 0 18px;
+  }
+
+  .tab-button span {
+    font-size: 0.95rem;
+  }
+
+  /* Content area */
+  .view {
+    order: 2;
+    width: 100%;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 28px clamp(24px, 6vw, 96px) 72px;
+  }
+
+  .view.active {
+    gap: 18px;
+  }
+
+  /* Card picker in a single row */
+  .finder-panel {
+    grid-template-columns: repeat(4, 1fr);
+    align-items: end;
+    gap: 14px;
+  }
+
+  .finder-panel label.wide {
+    grid-column: auto;
+  }
+
+  /* Offers as a responsive multi-column grid */
+  .results-list {
+    grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+    gap: 16px;
+  }
+
+  .detail-body {
+    max-width: 820px;
+  }
+
+  .source-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
