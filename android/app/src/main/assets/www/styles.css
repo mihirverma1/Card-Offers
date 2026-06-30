@@ -61,6 +61,10 @@ button, input, select { font: inherit; }
 .royal-glow-dot { width: 14px; height: 14px; border-radius: 50%; background: var(--gold-light); box-shadow: 0 0 18px 4px rgba(243, 217, 139, 0.7); animation: royalGlow 2.6s ease-in-out infinite; }
 .hero-dot { position: absolute; top: 72px; right: 64px; }
 
+/* Brand wordmark */
+.royal-brand { display: inline-flex; align-items: center; gap: 10px; margin: 0 0 22px; font: 600 22px/1 var(--font-serif); letter-spacing: 0.04em; color: var(--gold-light); text-shadow: 0 0 22px rgba(212, 175, 55, 0.35); }
+.royal-brand-mark { color: var(--gold); font-size: 18px; filter: drop-shadow(0 0 6px rgba(243, 217, 139, 0.6)); }
+
 /* Buttons */
 .royal-btn {
   position: relative; overflow: hidden; display: inline-flex; align-items: center; justify-content: center; gap: 11px;
