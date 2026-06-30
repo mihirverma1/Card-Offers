@@ -4,118 +4,94 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>My Card Offers</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="styles.css" />
   </head>
-  <body>
-    <main class="app-shell">
-      <header class="top-bar">
-        <div>
-          <span class="eyebrow">Your cards, your offers</span>
-          <h1 id="topTitle">See every offer on your card</h1>
-        </div>
-        <span class="sync-dot" aria-hidden="true"></span>
-      </header>
+  <body class="royal">
+    <header class="royal-hero">
+      <p class="royal-eyebrow">Your Cards, Your Offers</p>
+      <h1 class="royal-title">See every offer on your card</h1>
+      <p class="royal-sub">A curated vault of live privileges — refined for the card you carry.</p>
+      <div class="royal-glow-dot hero-dot"></div>
+    </header>
 
-      <!-- FINDER: pick your card -->
-      <section class="view active" id="finderView" aria-label="Choose your card">
-        <form class="finder-panel" id="cardForm">
-          <label class="wide">
-            <span>Bank</span>
-            <select id="bankSelect"></select>
-          </label>
+    <main class="app-main">
+      <nav class="royal-tabs" aria-label="Sections">
+        <button class="royal-tab is-active" type="button" data-view="finderView">My card</button>
+        <button class="royal-tab" type="button" data-view="savedView">Saved</button>
+        <button class="royal-tab" type="button" data-view="aboutView">About</button>
+      </nav>
 
-          <label class="wide">
-            <span>Card variant</span>
-            <select id="variantSelect"></select>
-          </label>
-
-          <label>
-            <span>Network</span>
-            <select id="networkSelect"></select>
-          </label>
-
-          <label>
-            <span>Category</span>
-            <select id="categorySelect">
-              <option value="">All categories</option>
-              <option>Shopping</option>
-              <option>Travel</option>
-              <option>Dining</option>
-              <option>Fuel</option>
-              <option>Grocery</option>
-              <option>Electronics</option>
-              <option>Entertainment</option>
-              <option>UPI</option>
-              <option>Movies</option>
-              <option>Insurance</option>
-              <option>Utilities</option>
-            </select>
-          </label>
-
-          <button class="primary-button wide" type="submit">
-            <span aria-hidden="true">⌕</span>
-            View my offers
-          </button>
+      <!-- FINDER -->
+      <section class="view active" id="finderView">
+        <form id="cardForm">
+          <div class="filter-grid">
+            <div class="royal-field">
+              <p class="royal-field-label">Bank</p>
+              <input class="royal-input" id="bankInput" list="bankList" placeholder="e.g. HDFC Bank" autocomplete="off" />
+            </div>
+            <div class="royal-field">
+              <p class="royal-field-label">Card Variant</p>
+              <input class="royal-input" id="variantInput" list="variantList" placeholder="e.g. Millennia" autocomplete="off" />
+            </div>
+            <div class="royal-field">
+              <p class="royal-field-label">Network</p>
+              <input class="royal-input" id="networkInput" list="networkList" placeholder="e.g. Visa" autocomplete="off" />
+            </div>
+            <div class="royal-field">
+              <p class="royal-field-label">Category</p>
+              <input class="royal-input" id="categoryInput" list="categoryList" placeholder="All categories (optional)" autocomplete="off" />
+            </div>
+          </div>
+          <button class="royal-btn royal-btn--block" type="submit"><span>View my offers</span></button>
         </form>
 
-        <section class="status-strip" id="statusStrip">
-          <strong>Pick your card</strong>
-          <span>Select your bank, card and network to see every live offer on it.</span>
-        </section>
+        <div class="royal-alert status-alert" id="statusStrip">
+          <svg class="royal-icon-glow" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f3d98b" stroke-width="2"><path d="M12 2 2 21h20L12 2z"/><path d="M12 9v5M12 17h.01"/></svg>
+          <div><h3>Pick your card</h3><p>Type your bank, card, network and category to see every live offer on it.</p></div>
+        </div>
 
-        <section class="results-list" id="resultsList" aria-live="polite"></section>
+        <div class="results-grid" id="resultsList" aria-live="polite"></div>
       </section>
 
-      <!-- DETAIL: full offer -->
-      <section class="view" id="detailView" aria-label="Offer details">
-        <button class="back-link" type="button" id="backToList">← Back to offers</button>
-        <article class="detail-body" id="detailBody"></article>
+      <!-- DETAIL -->
+      <section class="view" id="detailView">
+        <button class="royal-btn-ghost" type="button" id="backToList">← Back to offers</button>
+        <article class="royal-card detail-body" id="detailBody"></article>
       </section>
 
       <!-- SAVED -->
-      <section class="view" id="savedView" aria-label="Saved offers">
-        <h2>Saved offers</h2>
-        <section class="results-list" id="savedList"></section>
+      <section class="view" id="savedView">
+        <h2 class="section-title">Saved offers</h2>
+        <div class="results-grid" id="savedList"></div>
       </section>
 
       <!-- ABOUT -->
-      <section class="view" id="aboutView" aria-label="About">
-        <h2>How this works</h2>
-        <section class="source-grid">
-          <article>
-            <strong>1. We collect offers</strong>
-            <span>A crawler scans bank, network and merchant websites for current credit-card offers.</span>
-          </article>
-          <article>
-            <strong>2. We organise them</strong>
-            <span>Each offer is structured with its discount, validity, eligibility and full terms into one offers database.</span>
-          </article>
-          <article>
-            <strong>3. You just pick your card</strong>
-            <span>No card details needed — choose your bank, variant and network, and see what applies to you.</span>
-          </article>
-          <article>
-            <strong>Always verify</strong>
-            <span>Offers change often. Each offer links to the official source — confirm final terms there before you spend.</span>
-          </article>
-        </section>
+      <section class="view" id="aboutView">
+        <h2 class="section-title">How this works</h2>
+        <div class="results-grid">
+          <article class="royal-card"><h2 class="royal-card-title">1 · We collect offers</h2><p class="royal-card-body">A crawler scans bank, network and category-offer sites for the current offers on your card.</p></article>
+          <article class="royal-card"><h2 class="royal-card-title">2 · We organise them</h2><p class="royal-card-body">Each offer is structured with its discount, validity, eligibility and full terms into one offers vault.</p></article>
+          <article class="royal-card"><h2 class="royal-card-title">3 · You just pick your card</h2><p class="royal-card-body">No card details needed — type your bank, variant and network, and see what applies to you.</p></article>
+          <article class="royal-card"><h2 class="royal-card-title">Always verify</h2><p class="royal-card-body">Offers change often. Every offer links to its official source — confirm final terms there before you spend.</p></article>
+        </div>
       </section>
-
-      <nav class="bottom-tabs" aria-label="App sections">
-        <button class="tab-button active" type="button" data-view="finderView" aria-pressed="true">
-          <span aria-hidden="true">⌕</span>
-          My card
-        </button>
-        <button class="tab-button" type="button" data-view="savedView" aria-pressed="false">
-          <span aria-hidden="true">★</span>
-          Saved
-        </button>
-        <button class="tab-button" type="button" data-view="aboutView" aria-pressed="false">
-          <span aria-hidden="true">ⓘ</span>
-          About
-        </button>
-      </nav>
     </main>
+
+    <!-- Free-text inputs with optional autocomplete suggestions -->
+    <datalist id="bankList"></datalist>
+    <datalist id="variantList"></datalist>
+    <datalist id="networkList">
+      <option value="RuPay"></option><option value="Visa"></option><option value="Mastercard"></option><option value="American Express"></option><option value="Diners Club"></option>
+    </datalist>
+    <datalist id="categoryList">
+      <option value="Shopping"></option><option value="Travel"></option><option value="Dining"></option><option value="Fuel"></option><option value="Grocery"></option><option value="Electronics"></option><option value="Entertainment"></option><option value="UPI"></option><option value="Movies"></option><option value="Insurance"></option><option value="Utilities"></option>
+    </datalist>
 
     <script src="config.js"></script>
     <script src="script.js"></script>
