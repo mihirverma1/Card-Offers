@@ -31,6 +31,12 @@ function payload(offers, source, extra = {}) {
       ? `Found ${offers.length} live offer${offers.length > 1 ? "s" : ""} for your card. Tap any offer for full terms.`
       : "No offers listed for this card yet. We refresh offers regularly — check back soon.",
     disclaimer: "Always confirm final terms on the bank's linked page before you spend.",
+    debugEnv: {
+      hasGemini: Boolean(process.env.GEMINI_API_KEY),
+      hasOpenRouter: Boolean(process.env.OPENROUTER_API_KEY),
+      hasTavily: Boolean(process.env.TAVILY_API_KEY),
+      hasFirecrawl: Boolean(process.env.FIRECRAWL_API_KEY),
+    },
     ...extra,
   };
 }
